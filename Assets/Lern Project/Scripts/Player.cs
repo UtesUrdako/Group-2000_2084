@@ -7,6 +7,8 @@ namespace LernProject
 {
     public class Player : MonoBehaviour
     {
+        public KeyCode keySpell1;
+        
         public GameObject shieldPrefab;
         public Transform spawnPosition;
 
@@ -30,7 +32,7 @@ namespace LernProject
 
         void Update()
         {
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(keySpell1))
                 _isSpawnShield = true;
             
             _direction.x = Input.GetAxis("Horizontal");
@@ -65,6 +67,10 @@ namespace LernProject
         {
             var fixedDirection = transform.TransformDirection(_direction.normalized);
             transform.position += fixedDirection * (_isSprint ? speed * 2 : speed) * delta;
+
+
+
+            var parent = transform.parent;
         }
     }
 }
