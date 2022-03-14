@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Spawner : MonoBehaviour
 {
@@ -16,6 +17,9 @@ public class Spawner : MonoBehaviour
     [SerializeField] private int _countDie;
     [SerializeField] private List<GameObject> _enemys;
     [SerializeField] private float _timer;
+    
+    [SerializeField] private int _min;
+    [SerializeField] private int _max;
 
     private void Awake()
     {
@@ -59,10 +63,12 @@ public class Spawner : MonoBehaviour
 
     private void Spawn()
     {
-        for (int i = 0; i < _spawnPoints.Length; i++)
+        var count = Random.Range(_min, _max + 1);
+        for (int i = 0; i < count; i++)
         {
             _enemys.Add(Instantiate(_enemyPrefab, _spawnPoints[i].position, Quaternion.identity));
             _fillPoints[i] = true;
+            
         }
 
         _countDie = 0;
