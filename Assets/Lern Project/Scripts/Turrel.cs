@@ -25,7 +25,7 @@ namespace LernProject
                 direction);
             var abs = Mathf.Abs(pr);
             var rad = Mathf.Sin(abs);
-            var deg = rad * 57.3f;
+            var deg = rad * Mathf.Rad2Deg;
 
             if (deg <= 45f)
             {

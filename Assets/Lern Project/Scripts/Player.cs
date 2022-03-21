@@ -19,6 +19,7 @@ namespace LernProject
         public float speed = 2f;
         public float speedRotate = 20f;
         private bool _isSprint;
+        [SerializeField] private float _jumpForce = 10f;
         
         void Start()
         {
@@ -39,6 +40,9 @@ namespace LernProject
             _direction.z = Input.GetAxis("Vertical");
 
             _isSprint = Input.GetButton("Sprint");
+            
+            if (Input.GetKeyDown(KeyCode.Space))
+                GetComponent<Rigidbody>().AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
         }
 
         private void FixedUpdate()
