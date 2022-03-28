@@ -53,7 +53,7 @@ namespace LernProject
             _isFire = false;
             var shieldObj = Instantiate(_bulletPrefab, _spawnPosition.position, _spawnPosition.rotation);
             var shield = shieldObj.GetComponent<Bullet>();
-            shield.Init(_player.transform,10, 0.6f);
+            shield.Init(10, 0.6f);
             Invoke(nameof(Reloading), _cooldown);
         }
 

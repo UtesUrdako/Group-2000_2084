@@ -8,11 +8,21 @@ namespace LernProject
     public class Player : MonoBehaviour
     {
         public KeyCode keySpell1;
+        public KeyCode keySpell2;
         
         public GameObject shieldPrefab;
+        public GameObject bulletPrefab;
         public Transform spawnPosition;
+        public Transform spawnBulletPosition;
+        [SerializeField] private Animator _anim;
 
         private bool _isSpawnShield;
+        private bool _isFire;
+
+        [SerializeField] private float _cooldownTime1;
+        [SerializeField] private float _cooldownTime2;
+        [SerializeField] private bool _cooldown1;
+        [SerializeField] private bool _cooldown2;
         [HideInInspector] public int level = 1;
 
         private Vector3 _direction;
@@ -20,7 +30,17 @@ namespace LernProject
         public float speedRotate = 20f;
         private bool _isSprint;
         [SerializeField] private float _jumpForce = 10f;
-        
+
+        private ShieldGenerator _shieldGenerator;
+        private Gun _gun;
+
+        private void Awake()
+        {
+            _anim = GetComponent<Animator>();
+            _gun = new Gun(bulletPrefab, spawnPosition);
+            _shieldGenerator = new ShieldGenerator(10, shieldPrefab, spawnPosition);
+        }
+
         void Start()
         {
             var point1 = new Vector3(1f, 5f, 1462f);
@@ -33,13 +53,17 @@ namespace LernProject
 
         void Update()
         {
-            if (Input.GetKeyDown(keySpell1))
+            if (Input.GetKeyDown(keySpell1) && _cooldown1)
                 _isSpawnShield = true;
+            if (Input.GetKeyDown(keySpell2) && _cooldown2)
+                _isFire = true;
             
             _direction.x = Input.GetAxis("Horizontal");
             _direction.z = Input.GetAxis("Vertical");
 
             _isSprint = Input.GetButton("Sprint");
+
+            _anim.SetBool("IsWalking", _direction != Vector3.zero);
             
             if (Input.GetKeyDown(KeyCode.Space))
                 GetComponent<Rigidbody>().AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
@@ -50,31 +74,41 @@ namespace LernProject
             if (_isSpawnShield)
             {
                 _isSpawnShield = false;
-                SpawnShield();
+                _cooldown1 = false;
+                StartCoroutine(Cooldown1(_cooldownTime1, 1));
+                _shieldGenerator.Spawn();
+            }
+
+            if (_isFire)
+            {
+                _isFire = false;
+                _cooldown2 = false;
+                StartCoroutine(Cooldown1(_cooldownTime2, 2));
+                _gun.Spawn();
             }
             
             Move(Time.fixedDeltaTime);
-
-            transform.Rotate(new Vector3(0, Input.GetAxis("Mouse X") * speedRotate * Time.fixedDeltaTime, 0));
         }
 
-        private void SpawnShield()
+        private IEnumerator Cooldown1(float time, int numSpell)
         {
-            var shieldObj = Instantiate(shieldPrefab, spawnPosition.position, spawnPosition.rotation);
-            var shield = shieldObj.GetComponent<Shield>();
-            shield.Init(10 * level);
-            
-            shield.transform.SetParent(spawnPosition);
+            yield return new WaitForSeconds(time);
+            switch (numSpell)
+            {
+                case 1:
+                    _cooldown1 = true;
+                    break;
+                case 2:
+                    _cooldown2 = true;
+                    break;
+            }
         }
 
         private void Move(float delta)
         {
             var fixedDirection = transform.TransformDirection(_direction.normalized);
             transform.position += fixedDirection * (_isSprint ? speed * 2 : speed) * delta;
-
-
-
-            var parent = transform.parent;
+            transform.Rotate(new Vector3(0, Input.GetAxis("Mouse X") * speedRotate * Time.fixedDeltaTime, 0));
         }
     }
 }
